@@ -1,0 +1,219 @@
+@startuml
+
+class Alumno{
+- legajo: String
+- nombre: String
+- carrerasInscriptas: List<Carrera>
+- finalesAprobados: List<Materia>
+- cursadasAprobadas: List<Materia>
+- cursadasActuales: List<Cursada>
+- notasFinales: Map<Materia, ResultadoFinal>
++ inscribirACarrera(c: Carrera)
++ inscribirAMateria(m: Materia)
++ tieneFinalAprobado(m: Materia): boolean
++ tieneCursadaAprobada(m: Materia): boolean
++ estaCursando(m: Materia): boolean
++ agregarCursadaAprobada(m: Materia)
++ registrarFinalAprobado(m: Materia, n: double, c: String)
++ removerCursadaActual(c: Cursada)
+}
+
+class Carrera{
+- nombre: String
+- plan: PlanDeEstudio
++ verificarEgreso(a: Alumno): boolean
+}
+
+class CondicionInscripcionA{
++ puedeInscribirse(a: Alumno, m: Materia, p: PlanDeEstudio): boolean
+}
+
+class CondicionInscripcionB{
++ puedeInscribirse(a: Alumno, m: Materia, p: PlanDeEstudio): boolean
+}
+
+class CondicionInscripcionC{
++ puedeInscribirse(a: Alumno, m: Materia, p: PlanDeEstudio): boolean
+}
+
+class CondicionInscripcionD{
++ puedeInscribirse(a: Alumno, m: Materia, p: PlanDeEstudio): boolean
+}
+
+class CondicionInscripcionE{
++ puedeInscribirse(a: Alumno, m: Materia, p: PlanDeEstudio): boolean
+}
+
+class Cursada{
+- alumno: Alumno
+- materia: Materia
+- estado: IEstadoCursada
+- notaParcial: double
+- notaFinal: double
++ finalizarCursada()
++ rendirFinal(nF: double)
++ evaluarParcial(n: double)
++ setEstado(nE: IEstadoCursada)
+}
+
+class EstadoCursadaAprobada{
++ evaluarParcial(c: Cursada)
++ finalizarCursada(c: Cursada)
++ rendirFinal(c: Cursada)
++ getNombreEstado(): String
+}
+
+class EstadoCursadaDesaprobada{
++ evaluarParcial(c: Cursada)
++ finalizarCursada(c: Cursada)
++ rendirFinal(c: Cursada)
++ getNombreEstado(): String
+}
+
+class EstadoFinalAprobado{
++ evaluarParcial(c: Cursada)
++ finalizarCursada(c: Cursada)
++ rendirFinal(c: Cursada)
++ getNombreEstado(): String
+}
+
+class EstadoInscripto{
++ evaluarParcial(c: Cursada)
++ finalizarCursada(c: Cursada)
++ rendirFinal(c: Cursada)
++ getNombreEstado(): String
+}
+
+class EstadoParcialAprobado{
++ evaluarParcial(c: Cursada)
++ finalizarCursada(c: Cursada)
++ rendirFinal(c: Cursada)
++ getNombreEstado(): String
+}
+
+class EstadoParcialDesaprobado{
++ evaluarParcial(c: Cursada)
++ finalizarCursada(c: Cursada)
++ rendirFinal(c: Cursada)
++ getNombreEstado(): String
+}
+
+class EstadoPromocionada{
++ evaluarParcial(c: Cursada)
++ finalizarCursada(c: Cursada)
++ rendirFinal(c: Cursada)
++ getNombreEstado(): String
+}
+
+interface ICondicionInscripcion{
++ puedeInscribirse(a: Alumno, m: Materia, p: PlanDeEstudio): boolean
+}
+
+interface IEstadoCursada{
++ evaluarParcial(c: Cursada)
++ finalizarCursada(c: Cursada)
++ rendirFinal(c: Cursada)
++ getNombreEstado(): String
+}
+
+interface IPlanDeEstudio{
++ setNombreCarrera(c: String): IPlanDeEstudio
++ addMateriaObligatoria(o: Materia): IPlanDeEstudio
++ addMateriaOptativa(o: Materia): IPlanDeEstudio
++ setCantidadOptativas(c: int): IPlanDeEstudio
++ setEstrategiaInscripcion(e: CondicionInscripcion): IPlanDeEstudio
++ build():PlanDeEstudio
+}
+
+class Materia {
+- nombre: String
+- codigo: String
+- cargaHoraria: int
+- cuatrimestre: int
+- esObligatoria: boolean
+- correlativas: List<Materia>
++ agregarCorrelativa(mL Materia)
+}
+
+class PlanDeEstudio{
+- carrera: String
+- obligatorias: List<Materia>
+- optativas: List<Materia>
+- cantidadOptativas: int
+- estrategia: ICondicionInscripcion
+# PlanDeEstudio(builder: PlanDeEstudioBuilder): PlanDeEstudio
+}
+
+class PlanDeEstudioBuilder{
+- nombre: String
+- obligatorias: List<Materia>
+- optativas: List<Materia>
+- cantidadOptativas: int
+- estrategia: ICondicionInscripcion
++ setNombreCarrera(carrera: String): IPlanDeEstudio
++ addMateriaObligatoria(obligatoria: Materia): IPlanDeEstudio
++ addMateriaOptativa(optativa: Materia): IPlanDeEstudio
++ setCantidadOptativas(cantidad: int): IPlanDeEstudio
++ setEstrategiaInscripcion(estrategia: CondicionInscripcion): IPlanDeEstudio
++ build():PlanDeEstudio
+}
+
+class ResultadoFinal{
+- nota: double
+- condicion: String
+}
+
+class Universidad{
+- carreras: List<Carrera>
+- alumnos: List<Alumno>
++ agregarCarrera(c: Carrera)
++ agregarAlumno(a: Alumno)
++ obtenerMateriasHabilitadas(a: Alumno, c: Carrera, cD: int): List<Materia>
++ inscribirAlumnoAMateria(a: Alumno, m: Materia, c: Carrera)
++ verificarGraduacion(a: Alumno, c: Carrera): boolean
+}
+
+/' PATRON BUILDER: para crear el plan de estudio '/
+
+PlanDeEstudioBuilder ..|> IPlanDeEstudio
+PlanDeEstudioBuilder ..> PlanDeEstudio
+
+/' PATRON STRATEGY: para la condicion de inscripcion '/
+
+ICondicionInscripcion <|.. CondicionInscripcionA
+ICondicionInscripcion <|.. CondicionInscripcionB
+ICondicionInscripcion <|.. CondicionInscripcionC
+ICondicionInscripcion <|.. CondicionInscripcionD
+ICondicionInscripcion <|.. CondicionInscripcionE
+
+/' PATRON STATE: para los estados de la cursada de los alumnos'/
+IEstadoCursada <|.. EstadoCursadaAprobada
+IEstadoCursada <|.. EstadoCursadaDesaprobada
+IEstadoCursada <|.. EstadoFinalAprobado
+IEstadoCursada <|.. EstadoInscripto
+IEstadoCursada <|.. EstadoParcialAprobado
+IEstadoCursada <|.. EstadoParcialDesaprobado
+IEstadoCursada <|.. EstadoPromocionada
+
+Universidad "1" *-- "0..*" Carrera
+Universidad "1" *-- "0..*" Alumno
+
+Carrera "1" *-- "1" PlanDeEstudio
+
+PlanDeEstudio "1" o-- "0..*" Materia
+
+Alumno "0..*" -- "0..*" Carrera
+Alumno "1" -- "0..*" Materia
+
+Cursada "0..*" --> "1" Alumno
+Cursada "0..*" --> "1" Materia
+
+Materia "0..*" --> "0..*" Materia
+
+Cursada "1" o--> "1" IEstadoCursada
+
+PlanDeEstudio "1" --> "1" ICondicionInscripcion
+
+Alumno "1" o--> "0..*" ResultadoFinal
+
+@enduml
